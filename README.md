@@ -5,7 +5,8 @@
    
 az group create --name rg-func-dev --location "Central India"
 
-2. Create App Service Plan (Free Tier)
+2. Create App Service Plan
+   
 az appservice plan create \
   --name asp-common-dev \
   --resource-group rg-funcproject-dev \
