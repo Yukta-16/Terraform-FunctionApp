@@ -158,7 +158,7 @@ resource "azurerm_windows_function_app" "func" {
 
   site_config {
     application_stack {
-      node_version   = each.value.runtime == "node" ? (contains(keys(each.value), "node_version") && each.value.node_version != null ? each.value.node_version : var.node_version) : null
+      dotnet_version   = each.value.runtime == dotnet" ? (contains(keys(each.value), "dotnet_version") && each.value.dotnet_version != null ? each.value.dotnet_version : var.dotnet_version) : null
       python_version = each.value.runtime == "python" ? (contains(keys(each.value), "python_version") && each.value.python_version != null ? each.value.python_version : var.python_version) : null
     }
 }
