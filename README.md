@@ -1,8 +1,9 @@
 # Terraform-FunctionApp
 
 # Setup Steps:
-1. Create Resource Group
-# az group create --name rg-func-dev --location "Central India"
+1. Create Resource Group:
+   
+az group create --name rg-func-dev --location "Central India"
 
 2. Create App Service Plan (Free Tier)
 az appservice plan create \
