@@ -1,4 +1,4 @@
-# Log Analytics
+#Log Analytics
 resource "azurerm_log_analytics_workspace" "log" {
   for_each = var.app_name_list
 
@@ -10,7 +10,7 @@ resource "azurerm_log_analytics_workspace" "log" {
   tags = var.tags
 }
 
-# App Insights
+#App Insights
 resource "azurerm_application_insights" "appi" {
   for_each = var.app_name_list
 
@@ -23,7 +23,7 @@ resource "azurerm_application_insights" "appi" {
   tags = var.tags
 }
 
-# Storage Account
+#Storage Account
 resource "azurerm_storage_account" "stg" {
   for_each = var.app_name_list
 
@@ -36,7 +36,102 @@ resource "azurerm_storage_account" "stg" {
   tags = var.tags
 }
 
-# Existing App Service Plan
+#blob Private Endpoint
+
+resource "azurerm_private_endpoint" "storage_pe" {
+  for_each = var.app_name_list
+
+  name                = "pe-stg-${each.key}"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  subnet_id           = var.subnet_id
+ 
+  private_service_connection {
+    name                           = "psc-stg-${each.key}"
+    private_connection_resource_id = azurerm_storage_account.stg[each.key].id
+    subresource_names              = ["blob"]
+    is_manual_connection           = false
+  }
+
+  private_dns_zone_group {
+    name                 = "blob-zone"
+    private_dns_zone_ids = [var.blob_dns_id]
+  }
+}
+
+#Queue Endpoints
+resource "azurerm_private_endpoint" "queue_pe" {
+  for_each = var.app_name_list
+
+  name                = "pe-queue-${each.key}-${var.environment}"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  subnet_id           = var.subnet_id
+
+  private_service_connection {
+    name                           = "psc-queue-${each.key}"
+    private_connection_resource_id = azurerm_storage_account.stg[each.key].id
+    subresource_names              = ["queue"]
+    is_manual_connection           = false
+  }
+
+  private_dns_zone_group {
+    name                 = "queue-dns-${each.key}"
+    private_dns_zone_ids = [var.queue_dns_id]
+  }
+
+  depends_on = [azurerm_storage_account.stg]
+}
+
+#table Private Endpoints
+resource "azurerm_private_endpoint" "table_pe" {
+  for_each = var.app_name_list
+
+  name                = "pe-table-${each.key}-${var.environment}"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  subnet_id           = var.subnet_id
+
+  private_service_connection {
+    name                           = "psc-table-${each.key}"
+    private_connection_resource_id = azurerm_storage_account.stg[each.key].id
+    subresource_names              = ["table"]
+    is_manual_connection           = false
+  }
+
+  private_dns_zone_group {
+    name                 = "table-dns-${each.key}"
+    private_dns_zone_ids = [var.table_dns_id]
+  }
+
+  depends_on = [azurerm_storage_account.stg]
+}
+
+#File Private Endpoints
+resource "azurerm_private_endpoint" "file_pe" {
+  for_each = var.app_name_list
+
+  name                = "pe-file-${each.key}-${var.environment}"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  subnet_id           = var.subnet_id
+
+  private_service_connection {
+    name                           = "psc-file-${each.key}"
+    private_connection_resource_id = azurerm_storage_account.stg[each.key].id
+    subresource_names              = ["file"]
+    is_manual_connection           = false
+  }
+
+  private_dns_zone_group {
+    name                 = "file-dns-${each.key}"
+    private_dns_zone_ids = [var.file_dns_id]
+  }
+
+  depends_on = [azurerm_storage_account.stg]
+}
+
+#Existing App Service Plan
 data "azurerm_service_plan" "plan" {
   for_each = var.app_name_list
 
@@ -44,7 +139,7 @@ data "azurerm_service_plan" "plan" {
   resource_group_name = var.resource_group_name
 }
 
-# Function App
+#Function App
 resource "azurerm_windows_function_app" "func" {
   for_each = var.app_name_list
 
@@ -62,28 +157,45 @@ resource "azurerm_windows_function_app" "func" {
   }
 
   site_config {
-
-  dynamic "application_stack" {
-    for_each = each.value.runtime == "dotnet" ? [1] : []
-
-    content {
-      dotnet_version = "6"
+    application_stack {
+      node_version   = each.value.runtime == "node" ? (contains(keys(each.value), "node_version") && each.value.node_version != null ? each.value.node_version : var.node_version) : null
+      python_version = each.value.runtime == "python" ? (contains(keys(each.value), "python_version") && each.value.python_version != null ? each.value.python_version : var.python_version) : null
     }
-  }
-
 }
-
 
   app_settings = {
     FUNCTIONS_WORKER_RUNTIME = each.value.runtime
     APPINSIGHTS_KEY          = azurerm_application_insights.appi[each.key].instrumentation_key
-    #KEY_VAULT_URI = azurerm_key_vault.kv.vault_uri
+    KEY_VAULT_URI            = azurerm_key_vault.kv.vault_uri
   }
 
   tags = var.tags
 }
 
-# RBAC
+
+#Function Private Endpoint
+resource "azurerm_private_endpoint" "func_pe" {
+  for_each = var.app_name_list
+
+  name                = "pe-func-${each.key}"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  subnet_id           = var.subnet_id
+
+  private_service_connection {
+    name                           = "psc-func-${each.key}"
+    private_connection_resource_id = azurerm_windows_function_app.func[each.key].id
+    subresource_names              = ["sites"]
+    is_manual_connection           = false
+  }
+
+  private_dns_zone_group {
+    name                 = "func-zone"
+    private_dns_zone_ids = [var.function_dns_id]
+  }
+}
+
+#RBAC
 resource "azurerm_role_assignment" "rbac" {
   for_each = var.app_name_list
 

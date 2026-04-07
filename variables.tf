@@ -1,23 +1,59 @@
-variable "subscription_id" {}
-variable "tenant_id" {}
-
-variable "environment" {}
-variable "location" {}
+variable "location" {
+  type = string
+}
 
 variable "resource_group_name" {
-  default = "rg-funcproject-dev"
+  type = string
+}
+
+variable "environment" {
+  type = string
 }
 
 variable "dotnet_version" {
-  default = "6.0"
+  type    = string
+  default = "6"
 }
 
-# Managed Identity
 variable "user_identity_name" {
-  default = "func-identity"
+  type = string
+}
+ariable "identity_id" {
+  type = string
 }
 
-# MAIN MAP
+variable "principal_id" {
+  type = string
+}
+
+variable "subnet_id" {
+  type = string
+}
+
+variable "blob_dns_id" {
+  type = string
+}
+
+variable "queue_dns_id" {
+  type = string
+}
+
+variable "table_dns_id" {
+  type = string
+}
+
+variable "file_dns_id" {
+  type = string
+}
+
+variable "function_dns_id" {
+  type = string
+}
+
+variable "tags" {
+  type = map(string)
+}
+
 variable "app_name_list" {
   type = map(object({
     func_app_name         = string
