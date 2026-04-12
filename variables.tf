@@ -18,7 +18,8 @@ variable "dotnet_version" {
 variable "user_identity_name" {
   type = string
 }
-ariable "identity_id" {
+
+variable "identity_id" {
   type = string
 }
 
