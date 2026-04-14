@@ -74,7 +74,7 @@ az group create \
 * App Service Plan
 ```
 az appservice plan create \
-  --name asp-dev \
+  --name asp-common-dev \
   --resource-group rg-funcproject-dev \
   --location centralindia \
   --sku Y1 \
