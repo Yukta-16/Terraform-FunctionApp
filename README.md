@@ -2,12 +2,12 @@
 
 ---
 
-## 📖 Introduction
+## Introduction
 
 This project explains how to deploy multiple **Azure Function Apps using Terraform** with **modules and environment-based approach**.
 
 
-## 🏗️ Project Architecture
+## Project Architecture
 
 ```
 Root Module
@@ -19,7 +19,7 @@ Azure Resources
 
 ---
 
-## 📂 Project Structure Explained
+## Project Structure Explained
 
 ```
 .
@@ -39,12 +39,12 @@ Azure Resources
 ├── terraform.uat.tfvars
 ```
 
-### 🔹 modules/function_app
+### modules/function_app
 
 * Contains reusable Terraform code
 * Helps maintain clean and scalable infrastructure
 
-### 🔹 Root Files
+### Root Files
 
 * `main.tf` → Calls module
 * `variables.tf` → Global variables
@@ -52,7 +52,7 @@ Azure Resources
 * `providers.tf` → Azure provider config
 * `locals.tf` → Reusable values
 
-### 🔹 tfvars Files
+### tfvars Files
 
 * Used for environment-specific configurations:
 
@@ -61,7 +61,7 @@ Azure Resources
 
 ---
 
-## ⚙️ Prerequisites
+## Prerequisites
 
 Before running this project, ensure the following resources are already created in Azure:
 
@@ -163,7 +163,7 @@ Each environment uses a separate `.tfvars` file.
 
 ---
 
-## 🚀 Best Practices Followed
+## Best Practices Followed
 
 * Modular structure
 * Environment separation
