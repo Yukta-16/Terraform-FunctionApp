@@ -66,6 +66,11 @@ Azure Resources
 Before running this project, ensure the following resources are already created in Azure:
 
 * Resource Group
+```
+az group create \
+  --name rg-funcproject-dev \
+  --location centralindia
+```
 * App Service Plan
 
 These are **pre-existing shared resources**, and this project will use them to deploy multiple Azure Function Apps.
