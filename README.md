@@ -72,6 +72,13 @@ az group create \
   --location centralindia
 ```
 * App Service Plan
+```
+az appservice plan create \
+  --name asp-dev \
+  --resource-group rg-funcproject-dev \
+  --location centralindia \
+  --sku Y1 \
+```
 
 These are **pre-existing shared resources**, and this project will use them to deploy multiple Azure Function Apps.
 
